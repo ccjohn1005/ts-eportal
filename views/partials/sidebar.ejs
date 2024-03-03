@@ -1,0 +1,112 @@
+<!-- Sidebar -->
+<ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
+
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/users/dashboard">
+        <div class="sidebar-brand-icon">
+            <!-- <img id = "tslogo" class = "img-responsive-logo" src= "img/tslogo.png" alt = "Logo"> -->
+            <i class="fas fa-users"></i>
+
+        </div>
+        <div class="sidebar-brand-text mx-3">TS-ePortal <sup>v1.2.1</sup></div>
+    </a>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    <!-- Nav Item - DASHBOARD -->
+    <li class="nav-item active">
+        <a class="nav-link" href="/users/dashboard">
+            <i class="fa fa-info-circle"></i>
+            <span style="font-size: 14px; font-weight: 500;  ">DASHBOARD</span></a>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Modules
+    </div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true"
+            aria-controls="collapseThree">
+            <i class="fas fa-fw fa-cog"></i>
+            <span style="font-size: 14px; font-weight: 500;  ">NEWS</span>
+        </a>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="/memo">Announcements</a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseempinfo"
+            aria-expanded="true" aria-controls="collapseempinfo">
+            <i class="fas fa-fw fa-cog"></i>
+            <span style="font-size: 14px; font-weight: 500;  ">MENU</span>
+        </a>
+        <div id="collapseempinfo" class="collapse" aria-labelledby="headingempinfo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <!-- Need to further amend -->
+                <a class="collapse-item" href="/empprofiles/info/<%= user._id %>">Employee Profile</a>
+                <a class="collapse-item" href="/leave/leaveform">Leave Management</a>
+                <!-- <a class="collapse-item" href="/leave/leaveform/">Leave Amendements </a> -->
+            </div>
+        </div>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider">
+
+    <!-- Heading -->
+    <div class="sidebar-heading">
+        Addons
+    </div>
+
+    <!-- Nav Item - Pages Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
+            aria-controls="collapsePages">
+            <i class="fas fa-fw fa-folder"></i>
+            <span style="font-size: 14px; font-weight: 400;  ">Account Security</span>
+        </a>
+        <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="/changepsswd/<%= user._id %>">Change Password</a>
+                <div class="collapse-divider"></div>
+            </div>
+        </div>
+    </li>
+
+    <!-- Divider -->
+    <hr class="sidebar-divider d-none d-md-block">
+
+    <!-- Sidebar Toggler (Sidebar) -->
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
+
+    <!-- Sidebar for Greeting Message -->
+    <div class="sidebar-card ">
+        <!-- <img class=" sidebar-card-illustration mb-2" src="img/raya.jpg" >  -->
+        <h6 class="text-center mb-2"><strong><span style='font-size:20px;'>&#127774</span> Energize Box <span style='font-size:20px;'>&#127774</span></strong></h6>
+        <h7 id="quotewords" class="text-justify font-italic mb-1"></h7>
+        <h6 id="quotename" class = "font-italic" style="text-align: right;"></h6>
+
+    </div>
+</ul>
+<script>
+    fetch("https://type.fit/api/quotes")
+        .then(response => response.json())
+        .then(data => {
+            const randomNum = Math.floor((Math.random() * (data.length)))
+            document.getElementById("quotewords").textContent = data[randomNum].text;
+            document.getElementById("quotename").textContent = data[randomNum].author;
+        })
+</script>
+
+<!-- End of Sidebar -->

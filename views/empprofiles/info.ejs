@@ -1,0 +1,196 @@
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <%- include ../partials/sidebar %>
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <%- include ../partials/topbar %>
+  
+          <!-- Begin Page Content -->
+          <div class="container-fluid" id="container-memo">
+            <!-- Page Heading -->
+            <% include ../partials/messages %>
+            <div
+              class="d-sm-flex align-items-center justify-content-between mb-4">
+              <h1 class="h2 mb-0 text-gray-900"><strong>Employee Information</strong><hr class="title-line"></h1>
+              
+            </div>
+
+            <!-- Main Content /.container-fluid -->
+              <% if (empinfo.length === 0 ) { %>                
+                <div class="col-sm-md-8">
+                  <form method="POST" action="/empprofiles/info/upload/<%= user._id %>">
+                      <div class="form-row">
+                        <div class="form-group col-sm-md-6">
+                            <label for="name">Full Name</label>
+                            <!-- <input type="text" class="form-control" id="firstName" name="firstName" > -->
+                            <span style="font-weight: 300;" class="form-control" id="name" name="name"><strong><%= user.name %></strong></span>
+                        </div>
+
+                        <div class="form-group col-sm-md-6">
+                          <label for=email>Email Address: </label>
+                          <span style="font-weight: 300;" class="form-control" id="email" name="email"><strong><%= user.email %></strong></span>
+                        </div>
+
+                        <div class="form-group col-sm-md-3">
+                          <label for="empNo">Employee No. *</label>
+                          <span style="font-weight: 300;" class="form-control" id="empNo" name="empNo"><strong><%= user.empNo %></strong></span>  
+                        </div>
+                      </div>
+                      
+                      <div class="form-row">
+                        
+                        <div class="form-group col-sm-md-4">
+                          <label for="department">Department: 
+                          </label>
+                            <span style="font-weight: 300;" class="form-control" id="inputDepartment" name="inputDepartment"><strong><%= user.department %> </strong></span>  
+                        </div>
+                        <div class="form-group col-sm-md-3">
+                            <label for="gender">Gender *</label>
+                            <select class="custom-select" id="gender" name="gender" required>
+                              <option selected>Select one</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                            </select>
+                        </div>
+                      
+                        <div class="form-group col-sm-md-6">
+                          <label for="dateOfBirth">Date of Birth:</label>
+                          <input type="date" id="dateOfBirth" name="dateOfBirth" class=" form-control" placeholder="dd-mm-yyyy" />
+                        </div>
+                      </div>
+          
+                    <div class="form-row">
+            
+                    </div>
+                      <div class="form-row">
+
+                        
+                        <div class="form-group col-sm-md-4">
+                            <label for="jobTitle">Job title *</label>
+                            <input type="text" class="form-control" id="jobTitle" name="jobTitle" >
+                        </div>
+          
+                        <div class="form-group col-sm-md-4">
+                          <label for="approver">Approver *</label>
+                          <input type="text" class="form-control" id="approver" name="approver"  required>
+                        </div>
+                      </div>
+                      
+          
+                      <div class="form-row">
+                        <div class="form-group col-sm-md-3">
+                          <label for="leaveEntitlement">Leave Entitlement *</label>
+                          <input type="text" class="form-control" id="leaveEntitlement" name="leaveEntitlement" placeholder="">
+                        </div>
+          
+                        <div class="form-group col-sm-md-3">
+                          <label for="leaveBalance">Leave Balance *</label>
+                          <input type="text" class="form-control" id="leaveBalance" name="leaveBalance" placeholder="">
+                        </div>
+                      </div>
+                      
+                      <button type="submit" class="btn btn-primary "><b>Submit</b></button>
+                      
+                  </form>
+                </div>
+              <% }%>
+
+
+                <% for (let i = 0; i < empinfo.length; i++) { %> 
+                  <% let infodob = JSON.stringify(empinfo[i].dateOfBirth) %>
+
+                  <%# if (user._id.toString() === empinfo[i].userID._id.toString() ) { %> 
+ 
+                    <div class="col-sm-md-8">
+                      <form method="POST" action="/empprofiles/info/<%= user._id %>/edit?_method=PUT">
+                          <div class="form-row">
+                            <div class="form-group col-sm-md-6">
+                              <label for="firstName">Full Name</label>
+                              <!-- <input type="text" class="form-control" id="firstName" name="firstName" > -->
+                              <span style="font-weight: 300;" class="form-control" id="inputName" name="inputName" disabled readonly><strong><%= user.name %></strong></span>
+                            </div>
+
+                            <div class="form-group col-sm-md-6">
+                              <label for=inputEmail>Email Address</label>
+                              <span style="font-weight: 300;" class="form-control" id="inputEmail" name="inputEmail" disabled readonly><strong><%= user.email %></strong></span>
+                            </div>
+    
+                            <div class="form-group col-sm-md-3">
+                              <label for="empNo">Employee No.</label>
+                              <!-- <input type="text" class="form-control" id="empNo" name="empNo" > -->
+                              <span style="font-weight: 300;" class="form-control" id="inputEmpNo" name="inputEmpNo" disabled readonly><strong><%= user.empNo %></strong></span>  
+                              <!-- <input class="form-control" id="inputEmpNo" name="empNo1" value="<%#= user.empNo %> " > -->
+                            </div>
+                          </div>
+                          
+                          <div class="form-row">
+                            <div class="form-group col-sm-md-4">
+                              <label for="department">Department</label>
+                                <span style="font-weight: 300;" class="form-control" id="inputDepartment" name="inputDepartment" disabled readonly><strong><%= user.department %> </strong></span>  
+                            </div>
+
+                            <div class="form-group col-sm-md-3">
+                                <label for="gender">Gender</label>
+                                <select  class="custom-select" id="gender" name="gender" required>
+                                  <option selected><%= empinfo[i].gender %></option>
+                                  <option value="Male">Male</option>
+                                  <option value="Female">Female</option>
+                                </select>
+                            </div>
+                          
+                            <div class="form-group col-sm-md-6">
+                              <label for="dateOfBirth">Date of Birth</label>
+                              <input type="date" id="dateOfBirth" name="dateOfBirth" class=" form-control" value= "<%= infodob.substr(1,10) %>"/>
+                            </div>
+                          </div>
+              
+                        <div class="form-row">
+                          
+                          
+                        </div>
+                          <div class="form-row">
+                            
+                            
+                            <div class="form-group col-sm-md-4">
+                                <label for="jobTitle">Job title</label>
+                                <input class="form-control" id="jobTitle" name="jobTitle" value="<%= empinfo[i].jobTitle %> " >
+                            </div>
+              
+                            <div class="form-group col-sm-md-4">
+                              <label for="approver">Approver</label>
+                              <input type="text" class="form-control" id="approver" name="approver" value="<%= empinfo[i].approver %> " required>
+                            </div>
+                          </div>
+              
+                          <div class="form-row">
+                            <div class="form-group col-sm-md-3">
+                              <label for="leaveEntitlement">Leave Entitlement</label>
+                              <input type="text" class="form-control" id="leaveEntitlement" name="leaveEntitlement" value="<%= empinfo[i].leaveEntitlement %> ">
+                            </div>
+              
+                            <div class="form-group col-sm-md-3">
+                              <label for="leaveBalance">Leave Balance</label>
+                              <input type="text" class="form-control" id="leaveBalance" name="leaveBalance" value="<%= empinfo[i].leaveBalance %> ">
+                            </div>
+                          </div>
+                          
+                          <button  type="submit" class="btn btn-primary "><b>Save Changes</b></button>
+                          
+                      </form>
+                    </div>
+                  <% } %> 
+                <%# } %> 
+                  
+
+            <!-- End of Main Content -->
+          </div>
+          <!-- End of Content Wrapper -->
+        </div>
+        <%- include ../partials/footer %>
+      </div>
+    </div>
+  </body>
+  

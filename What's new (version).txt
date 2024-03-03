@@ -1,0 +1,15 @@
+V1.1
+* Added the function for user to update their user profile.
+* Change the new calender style and date format.
+* Bug fixes on register part
+* Apply for Annual Leave three days in advance, otherwise the system will consider it as Emergency Leave. Except for the Medical Leave and Unpaid Leave.
+* Apply and Edit the leave will not send an email or carbon copy (CC) to HR Department, it will send to your approver and requestor. The HR department receives an email or carbon copy (CC) only after the approver approves or declines the leave. 
+* The leave which already been approved by the approver is not able to update/edit. 
+* Withdraw the leave will be permanently deleted and will not be recorded.
+* 
+
+
+----------------------
+V1.1.2
+* Fix the route bug on dashboard page.
+* 

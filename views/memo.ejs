@@ -1,0 +1,274 @@
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <%- include ./partials/sidebar %>
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+                    <%- include ./partials/topbar %>
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid" id="container-memo">
+
+                            <!-- Main Content /.container-fluid -->
+                            <!-- Page Heading -Title -->
+                            <% include ./partials/messages %>
+                                <div class="d-sm-flex ">
+                                    <div class="d-sm-flex align-items-center justify-content-between mb-4 mr-auto">
+                                        <h1 class="h2 mb-0 text-gray-900"><strong>Announcements</strong><hr class="title-line"></h1>
+                                    </div>
+
+                                    <!-- Upload function  -->
+                                    <% if ( user.isAdmin=== true ) {%>
+                                        <div id="upload" class="mt-1">
+                                            <button class="btn btn-success" data-toggle="modal"
+                                                data-target="#uploadmodal" type="submit"><strong>NEW</strong></button>
+                                        </div>
+
+                                        <!-- Modal UPLOAD-->
+                                        <div class="modal fade" id="uploadmodal" tabindex="-1" role="dialog"
+                                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">Upload
+                                                            Document</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+
+                                                        <form id="uploadForm" action="/upload" method="POST"
+                                                            enctype="multipart/form-data">
+                                                            <div class="form-group">
+                                                                <label for="inputEmail">Insert the title: </label>
+                                                                <input type="text" class="form-control" id="titleName"
+                                                                    name="titleName" placeholder="Enter Subject">
+                                                                <!-- <small id="" class="form-text text-muted">*The memo title
+                                                    name*</small> -->
+                                                            </div>
+
+                                                            <div class="md-form">
+                                                                <i class="fas fa-pencil prefix grey-text"></i>
+                                                                <label data-error="wrong" data-success="right"
+                                                                    for="form8">Your
+                                                                    message: </label>
+                                                                <textarea type="text" id="contentMemo"
+                                                                    name="contentMemo" class="md-textarea form-control"
+                                                                    rows="4"></textarea>
+                                                            </div>
+
+                                                            <div></br> Upload:</div>
+
+                                                            <div class="custom-file">
+                                                                <input id="inpFile" name="myMemo" type="file"
+                                                                    class="custom-file-input" id="customFile">
+                                                                <label class="custom-file-label" for="customFile">Choose
+                                                                    file:
+                                                                </label>
+                                                                <small id="" class="form-text text-muted"><i>(Only PDF
+                                                                        file
+                                                                        under
+                                                                        10MB is allow to upload.)</i></small>
+                                                            </div>
+
+                                                    </div>
+
+                                                    <div class="modal-footer ">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Close</button>
+                                                        <button type="submit" id="submitTitle" class="btn btn-primary"
+                                                            data-dismiss="#accordion">Upload</button>
+
+                                                    </div>
+                                                    <div id="progress" class="progress" style="height: 5px;">
+                                                        <div class="progress-bar progress-bar-striped"
+                                                            role="progressbar" aria-valuenow="25" aria-valuemin="0"
+                                                            aria-valuemax="100"></div>
+                                                    </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <%} else{ %>
+                                            <div id="upload"><button type="submit"
+                                                    style="display: none;">Upload</button></div>
+                                            <% }%>
+                                </div>
+
+
+
+                                <!-- /.container-fluid -->
+                                <% let indexID=1 %>
+                                    <% memo.reverse().forEach (function (info){ %>
+                                        
+                                        <div id="accordion">
+                                            <div class="card" id="memo-card">
+                                                <div class="card-header" id="headRow<%= indexID %>">
+                                                    <h5 class="mb-0 text-gray-800" data-toggle="collapse"
+                                                        data-target="#collapseOne<%= indexID %>" aria-expanded="true"
+                                                        aria-controls="collapseOne<%= indexID %>">
+                                                        <strong ><%= indexID %>.  </strong><%= info.title %>  
+                                                        <% if ( user.isAdmin === true ) {%>
+                                                            <i id="update" 
+                                                                class="fas fa-edit fa-lg align-middle float-right"
+                                                                data-toggle="modal"
+                                                                data-target="#updatemodal<%= indexID %>"
+                                                                type="submit"></i>
+                                                            <i id="delete"
+                                                                class="fas fa-trash-alt fa-lg align-middle float-right "
+                                                                data-toggle="modal"
+                                                                data-target="#deletemodal<%= indexID %>"
+                                                                type="submit"></i>
+                                                            <% }; %> 
+                                                    </h5>
+                                                    
+                                                </div>
+                                                
+                                                <div id="collapseOne<%= indexID %>" class="collapse"
+                                                    aria-labelledby="headRow<%= indexID %>" data-parent="#accordion">
+                                                    <div class="card-body">
+                                                        <%= info.desc %><br>
+                                                            <a href="uploads/<%= info.newFileName %>"
+                                                                target="_blank">Read
+                                                                more!</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <br>
+                                        
+                                        <!-- Modal UPDATE-->
+                                        <div class="modal fade" id="updatemodal<%= indexID %>" tabindex="-1"
+                                            role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">
+                                                            Edit Content</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method="POST" action="/memo/<%= info._id %>/edit?_method=PUT"
+                                                        enctype="multipart/form-data">
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label for="inputEmail">Insert new the title: </label>
+                                                                <input type="text" class="form-control" id="titleName"
+                                                                    name="titleName" placeholder="Enter New Subject"
+                                                                    Value="<%= info.title %>">
+                                                            </div>
+
+                                                            <div class="md-form">
+                                                                <i class="fas fa-pencil prefix grey-text"></i>
+                                                                <label data-error="wrong" data-success="right"
+                                                                    for="form8">Your
+                                                                    new message: </label>
+                                                                <textarea type="text" id="contentMemo"
+                                                                    name="contentMemo" class="md-textarea form-control"
+                                                                    rows="4"><%= info.desc %></textarea>
+                                                            </div>
+
+                                                            <div></br> Upload:</div>
+
+                                                            <div class="custom-file">
+                                                                <input name="myMemo" type="file"
+                                                                    class="custom-file-input" id="customFile">
+                                                                <label class="custom-file-label" for="customFile">Choose
+                                                                    file:
+                                                                </label>
+                                                                <small class="form-text text-muted"><i>(Only
+                                                                        PDF file under
+                                                                        10MB is allow to upload.)</i></small>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="submit" id="submitTitle"
+                                                                class="btn btn-primary"
+                                                                data-dismiss="#accordion">Update</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- Modal DELETE-->
+                                        <div class="modal fade" id="deletemodal<%= indexID %>" tabindex="-1"
+                                            role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">
+                                                            Delete memo?</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <form method="POST"
+                                                        action="/memo/<%= info._id %>/delete?_method=DELETE">
+                                                        <div class="modal-body">
+                                                            <label for="inputEmail">Do you want to DELETE <strong>"<%=
+                                                                        info.title %> "
+                                                                </strong>memo?</label>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Close</button>
+                                                            <button type="submit" id="delMemoBtn"
+                                                                class="btn btn-primary"
+                                                                data-dismiss="#accordion">Delete</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    <% indexID++; %>
+                                    
+                                    <% }) %>
+
+                                                <!-- End of Main Content -->
+                        </div>
+
+                        <!-- End of Main Content  -->
+                </div>
+
+                <%- include ./partials/footer %>
+                    <!-- End of Main Content-wrapper -->
+            </div>
+        <!-- End of Page Content Wrapper -->
+    </div>
+
+</body>
+
+
+<script>
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function () {
+        const fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+
+    // For display Upload column name file name
+    $(document).ready(function () {
+        $('#submitTitle').click(function () {
+            let returnTitle = $("#uploadmodal #titleName").val().trim();
+            $('#collapseTitle').html(returnTitle);
+        });
+    });
+</script>

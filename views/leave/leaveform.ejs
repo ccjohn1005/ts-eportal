@@ -1,0 +1,1765 @@
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="/flatpickr/flatpickr.min.css">
+<!-- Custom styles for this page -->
+<!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/r-2.3.0/datatables.min.css"/> -->
+<link rel="stylesheet" type="text/css" href="/datatable/DataTables-1.12.1/datatables.min.css" />
+
+
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <%- include ../partials/sidebar %>
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <%- include ../partials/topbar %>
+  
+          <!-- Begin Page Content -->
+          <div class="container-fluid" id="container-memo">
+            <!-- Page Heading -->
+            <% include ../partials/messages %>
+            <div
+              class="d-sm-flex align-items-center justify-content-between mb-4">
+              <h1 class="h2 mb-0 text-gray-900"><strong>Leave Management</strong><hr class="title-line"></h1>
+              
+            </div>
+            <!-- Nav-Tab menu  -->
+            <ul class="nav nav-tabs mb-3">
+              <li class="nav-item">
+                <a class="nav-link active" href="#home" data-toggle="tab">Apply Leave</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link " href="#manageLeaveStatus" data-toggle="tab">Manage Leave</a>
+              </li>
+              <% if (user.isApprover === true ) { %> 
+              <li class="nav-item">
+                <a class="nav-link " href="#leaveApproval" data-toggle="tab">Leave Approval</a>
+              </li>
+              <% }  else {%>
+                <li class="nav-item">
+                  <a class="nav-link " href="#employeeLeaveHistory" data-toggle="tab">History</a>
+                </li>
+                <% } %> 
+                <% if (user.isApprover === true ) { %> 
+                  <li class="nav-item">
+                    <a class="nav-link " href="#mgmtLeavehistory" data-toggle="tab">History</a>
+                  </li>
+                  <% } %>
+                <% if (user.isAdmin === true && (user.department === "Information Technology" || user.department === "Human Resources")) { %>
+                  <li class="nav-item">
+                    <a class="nav-link " href="#hrLeaveAmendment" data-toggle="tab">Leave Amendment (HR)</a>
+                  </li>
+                  <% } %>  
+            </ul>
+
+
+          <!-- Main Content /.container-fluid -->
+            <div class="tab-content" id="tabs">
+
+              <!-- Home nav-tab apple leave -->
+                  <div id="home" class="col-sm-md-auto tab-pane fade show active">
+                    <form id="leave-form"  method="POST"  action="/leaveform/submit/<%= user._id %>">
+                        <div class="form-row">
+                          <div class="form-group col-sm-md-6">
+                              <label for="fullName">Applicant Name: 
+                              </label>
+                              <input type="text" class="form-control" id="fullName" name="fullName" value= "<%= user.name %>" disabled readonly>
+                          </div>
+                          <div class="form-group col-sm-md-4">
+                            <label for="department">Department: </label>
+                              <input type="text" class="form-control" id="department" name="department" value="<%= user.department %>" disabled readonly">
+                          </div>
+                        </div>
+                        
+                        <div class="form-row">
+                          <div class="form-group col-sm-md-3">
+                              <label for="empNo">Employee No. :</label>
+                              <input type="text" class="form-control" id="empNo" name="empNo" value="<%= user.empNo %>" disabled readonly >
+                              
+                        </div>
+                         
+                          <div class="form-group col-sm-md-4 " >
+                            <label for="leaveCategory">Leave Category: 
+                            </label>
+                            <select id="leavecat1" name="leavecat" class="form-control">
+                              <option selected></option>
+                              <option value="Annual Leave (AL)">Annual Leave (AL)</option>
+                              <option value="Medical Leave (MC)">Medical Leave (MC)</option>
+                              <option value="Emergency Leave (EL)">Emergency Leave (EL)</option>
+                              <option value="Unpaid Leave (UL)">Unpaid Leave (UL)</option>
+                              <option value="Maternity Leave (ML)">Maternity Leave (ML)</option>
+                              <option value="Special Leave (SL)">Special Leave (SL)</option>
+                            </select>
+                          </div>
+
+                        </div>
+                         
+                        <div class="form-row">
+
+
+                          <div class="form-group .col-auto .mr-auto ">
+                            <label for="fromDate">From:</label>
+                            <sup><b>Day-Month-Year</b></sup>
+                            <input type="text" id="fromDate" name="fromDate" class="form-control flatpickr" required />
+
+                          </div>
+      
+                          <div class="form-group .col-auto .mr-auto ">
+                            <label for="toDate">To:</label>
+                            <sup><b>Day-Month-Year</b></sup>
+                            <input type="text" id="toDate" name="toDate" class="form-control flatpickr " required />
+                          </div>
+                        </div>
+      
+                        <div class="form-row">
+
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="day">Day: 
+                                <sup><b>Bilangan Hari</b></sup>
+                              </label>
+                              <select id="day" name="day" class="form-control">
+                                <option value="" selected disabled hidden>Choose Day</option>
+                                <% let dayN = 0.5; %> 
+                                <% for (let counter = 0; counter <= 9; counter++ ) { %> 
+                                    <option value="<%= dayN %> "><%= dayN %> </option>
+                                    <% dayN += 0.5 %> 
+                                    <% } %>
+                                  </select>
+                            </div>
+                        
+                          <div class="form-group col-sm-md-4">
+                              <label for="TimeTypes">Time Types: 
+                                <sup><b>Jenis Masa</b></sup>
+                            </label>                      
+                            <select id="timetype" name="timetype" class="form-control" required>
+                              <option value=""></option>
+                              <option value= "Full Day">Full Day</option>
+                              <option value= "First Half">First Half @ AM</option>
+                              <option value= "Second Half">Second Half @ PM</option>
+                            </select>
+                          </div>
+      
+                        </div>
+                        
+                        <div class="form-row">
+      
+                          <div class="form-floating col-sm-md-8">
+                            <label for="reason">Reason: 
+                            </label>
+                            <textarea id="reason" name="reason" class=" form-control" rows="2" cols="50"  required></textarea>
+                          </div>
+                        </div>
+
+                        <% const approverEmailAddress = [
+                            "fl.look@tekseng.co", 
+                            "je.loh@tekseng.co", 
+                            "ec.loh@tekseng.co",       
+                            "lm.lim@tekseng.co",
+                            "hcho@tekseng.co",
+                            "jessica.loh@tekseng.co",
+                            "pl.hoo@tekseng.co",
+                            "hr@tekseng.co",
+                            "lai@tekseng.co",
+                            "john.chew@tekseng.co",
+                            "jw.loh@tekseng.co",
+                            "kc.loh@tekseng.co",
+                            "kb.loh@tekseng.co"
+                            ]; %>   
+                        <% const approverName = [
+                            "LOOK FONG LIANG", // 0
+                            "LOH JOO ENG",    // 1
+                            "LOH ENG CHUN", // 2
+                            "LIM LI MING", // 3
+                            "HO HOCK CHYE",  // 4
+                            "JESSICA LOH LOO HAR", //5
+                            "HOO PHAIK LIN",  // 6
+                            "TENG LAY HUAH", // 7
+                            "LAI CHIN PING", // 8
+                            "CHEW KHA JOHN", // 9
+                            "LOH JIA WOOI", // 10
+                            "LOH KOK CHENG", // 11
+                            "LOH KOK BENG"
+                            ]; %> 
+
+                        <% if (user.department === "Account & Finance" && user.isApprover === false) { %> 
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver: 
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control" required>
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                <!-- Look and jeloh -->
+                                    <option value="<%= approverEmailAddress[0]  %>"><%= approverName[0] %> </option>  
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                              </select>
+                            </div>
+                          </div>
+                        
+                        <% } else if (user.department === "Export Sales & Admin" && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver: 
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[4]  %>"><%= approverName[4] %> </option>
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if (user.department === "Local Sales & Admin" && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver: 
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[6]  %>"><%= approverName[6] %> </option>
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                    <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if ( (user.department === "Production" || user.department === "Design" || user.department === "Procurement") && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver:
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                    <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if (user.department === "Human Resources"  && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver: 
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[7]  %>"><%= approverName[7] %> </option>
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if (user.department === "Warehouse & Sampling"  && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver:
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[5]  %>"><%= approverName[5] %> </option>
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if (user.department === "Occupational Safety and Health"  && user.isApprover === false) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver:
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver  -->
+                                    <option value="<%= approverEmailAddress[8]  %>"><%= approverName[8] %> </option>
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+
+                          <!-- // for those head of department (exclude John, EC, JE, TENG, lm.lim, lai) -->
+                        <% } else if ((user.isAdmin === false && user.isApprover === true && user.email != "lai@tekseng.co") ) { %>
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver:
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver JELOH and EC -->
+                                    <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                    <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                        <% } else if (user.email === "lai@tekseng.co") { %> 
+                          <div class="form-row">
+                            <div class="form-group .col-auto .mr-auto">
+                              <label for="approver">Approver:
+                                <sup><b></b></sup>
+                              </label>
+                              <select id="approver" name="approver" class="form-control">
+                                <option value="" selected disabled hidden>Choose here</option>
+                                <!-- Only these email address can be the approver liming and EC --> 
+                                    <option value="<%= approverEmailAddress[3]  %>"><%= approverName[3] %> </option>
+                                    <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <% } else if (user.email === "hr@tekseng.co" || user.email === "lm.lim@tekseng.co" || user.email === "john.chew@tekseng.co") { %> 
+                            <div class="form-row">
+                              <div class="form-group .col-auto .mr-auto">
+                                <label for="approver">Approver:
+                                  <sup><b></b></sup>
+                                </label>
+                                <select id="approver" name="approver" class="form-control">
+                                  <option value="" selected disabled hidden>Choose here</option>
+                                  <!-- Only these email address can be the approver  -->
+                                      <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                      <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                </select>
+                              </div>
+                            </div>
+
+                          <% } else if (user.email === "je.loh@tekseng.co" ) { %> 
+                            <div class="form-row">
+                              <div class="form-group .col-auto .mr-auto">
+                                <label for="approver">Approver:
+                                  <sup><b></b></sup>
+                                </label>
+                                <select id="approver" name="approver" class="form-control">
+                                  <option value="" selected disabled hidden>Choose here</option>
+                                  <!-- Only these email address can be the approver  -->
+                                      <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                      <option value="<%= approverEmailAddress[10]  %>"><%= approverName[10] %> </option>
+                                </select>
+                              </div>
+                            </div>
+
+                            <% } else if (user.email === "ec.loh@tekseng.co" || user.email === "jw.loh@tekseng.co") { %> 
+                              <div class="form-row">
+                                <div class="form-group .col-auto .mr-auto">
+                                  <label for="approver">Approver:
+                                    <sup><b></b></sup>
+                                  </label>
+                                  <select id="approver" name="approver" class="form-control">
+                                    <option value="" selected disabled hidden>Choose here</option>
+                                    <!-- Only these email address can be the approver  -->
+                                        <option value="<%= approverEmailAddress[11]  %>"><%= approverName[11] %> </option>
+                                        <option value="<%= approverEmailAddress[12]  %>"><%= approverName[12] %> </option>
+                                  </select>
+                                </div>
+                              </div>
+
+                          <% } %>
+
+                            
+                        <button type="submit" class="btn btn-primary"><b>Submit Request</b></button>
+                    </form>
+                  </div>
+
+              <!-- manageLeaveStatus -->
+              <!-- Only display the 7 days of the submitDate, for those 8th days leave record will display on History  -->         
+                  <div class="tab-pane fade show" id="manageLeaveStatus">
+                    <table class="table table-hover table-bordered table-responsive ">
+                      <thead>
+                        <tr style="background-color: rgba(0, 112, 255, 0.08)">
+                          <th scope="col">Action</th>
+                          <th scope="col">Status</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">From</th>
+                          <th scope="col">To</th>
+                          <th scope="col">Days</th>
+                          <th scope="col">Time Types</th>
+                          <th scope="col">Reason</th>
+                          <th scope="col">Applied Date</th>
+                          <th scope="col">Updated Date</th>
+                          <th scope="col">Approved Date</th>
+                          <th scope="col">Approved By</th>
+
+                        </tr>
+                      </thead>
+                      
+                      <% let indexID = 0 %>
+                        <% const date = new Date(); %> 
+                        <!-- Only display the 7 days of the submitDate, for those 8th days leave record will display on History  -->
+                        <% date.setDate(date.getDate()- 7);  %> 
+                        <% for (let i = 0; i < leaveDataInfo.length; i++) { %>
+                          <% if ( ( leaveDataInfo[i].empNo === user.empNo && date.toString() < leaveDataInfo[i].approvedDate ) || ( leaveDataInfo[i].empNo === user.empNo && leaveDataInfo[i].approvedDate === " " ) ) { %> 
+
+                            
+                        <tr class="">
+                          <% if (leaveDataInfo[i].status === "Pending" ) { %> 
+                            <td>
+                              <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                              >Update</button>
+   
+                              <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" title="Edit" data-toggle="modal" data-target="#editLeaveModal-<%= indexID %>">
+                                  <i class="far fa-edit fa-2x"></i><b>Edit</b></a>
+  
+                                <a class="dropdown-item" href="#" title="Deleted" data-toggle="modal" data-target="#withdrawLeaveModal-<%= indexID %>"
+                                  style="color:#000000;text-decoration:none; border-top: 1px solid; border-top-color: rgb(230, 230, 230);" >
+                                  <i class="fas fa-trash fa-2x"></i><b>  Withdraw</b></a> 
+                              </div>    
+                            </td>
+                            <% } else { %>
+                              <td></td>
+                            <% } %> 
+                          <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                            <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                          <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                            <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                            <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else { %>
+                            <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                            <% } %> 
+                            
+                          <td><%= leaveDataInfo[i].leavecat %></td>
+                          <td><%= leaveDataInfo[i].fullName %></td>
+                          <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].day %></td>
+                          <td><%= leaveDataInfo[i].timetype %> </td>
+                          <td><%= leaveDataInfo[i].reason %></td>
+                          <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].actionBy %></td>
+                      
+
+
+
+                          <!-- Delete Leave function Modal -->
+                          <div class="modal fade" id="withdrawLeaveModal-<%= indexID %>" tabindex="-1"
+                            role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">
+                                            Leave Cancellation</h5>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form method="POST"
+                                        action="/leaveform/submit/<%= leaveDataInfo[i]._id %>/withdraw/<%= user._id %>?_method=DELETE">
+                                        <div class="modal-body">
+                                            <label for="inputEmail">Do you want to withdraw this application?</label>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="submit" id="delMemoBtn"
+                                                class="btn btn-primary"
+                                                data-dismiss="#accordion">Withdraw</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                          </div>
+
+                          <!-- Update Leave Modal -->
+                          <div class="modal fade" id="editLeaveModal-<%= indexID %>" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">Leave Amendment 
+                                            </h5>
+                                        <button type="button" class="close" data-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form id="leave-form-put"  method="POST" action="/leaveform/submit/<%= leaveDataInfo[i]._id %>/edit/<%= user._id %>?_method=PUT">
+                                      <div class="modal-body">
+                                        <div class="form-row">
+                                          <div class="form-group col-sm-md-4">
+                                            <label for="leaveCategory">Leave Category: 
+                                            </label>
+                                            <select id="leavecat" name="leavecat" class="form-control">
+                                              <option selected><%= leaveDataInfo[i].leavecat %> </option>
+                                              <option value="Annual Leave (AL)">Annual Leave (AL)</option>
+                                              <option value="Medical Leave (MC)">Medical Leave (MC)</option>
+                                              <option value="Emergency Leave (EL)">Emergency Leave (EL)</option>
+                                              <option value="Unpaid Leave (UL)">Unpaid Leave (UL)</option>
+                                              <option value="Maternity Leave (ML)">Maternity Leave (ML)</option>
+                                              <option value="Special Leave (SL)">Special Leave (SL)</option>
+                                            </select>
+                                          </div>
+                                          <div class="form-group .col-auto .mr-auto">
+                                            <label for="fromDate">From Date:</label>
+                                            <sup><b>Day-Month-Year</b></sup>
+                                            <input type="text" id="fromDate2" name="fromDate2" class="form-control flatpickr" value="<%= leaveDataInfo[i].fromDate.toString().substr(0,16) %>" required />
+                                            
+                                          </div>
+                        
+                                          <div class="form-group .col-auto .mr-auto">
+                                            <label for="toDate">To Date:</label>
+                                            <sup><b>Day-Month-Year</b></sup>
+                                            <input type="text" id="toDate2" name="toDate2" class="form-control flatpickr" value="<%= leaveDataInfo[i].toDate.toString().substr(0,16) %>" required />
+                                          </div>
+                                        </div>
+                        
+                                        <div class="form-row">
+ 
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="day">Day:* 
+                                            <sup><b>Bilangan Hari</b></sup>
+                                          </label>
+                                          <select id="day" name="day" class="form-control">
+                                            <option value="<%= leaveDataInfo[i].day %>" selected><%= leaveDataInfo[i].day %> </option>
+                                            <!-- Only these email address can be the approver  -->
+                                            <% let dayN = 0.5; %> 
+                                            <% for (let counter = 0; counter <= 9; counter++ ) { %> 
+                                                <option value="<%= dayN %> "><%= dayN %> </option>
+                                                <% dayN += 0.5 %> 
+                                                <% } %>
+                                              </select>
+                                        </div>
+                                        
+                                          <div class="form-group col-sm-md-4">
+                                              <label for="TimeTypes">Time Types: 
+                                                <sup><b>Jenis Masa</b></sup>
+                                            </label>                      
+                                            <select id="timetype" name="timetype" class="form-control">
+                                              <option value="<%= leaveDataInfo[i].timetype %>" selected><%= leaveDataInfo[i].timetype %></option>
+                                              <option value= "Full Day">Full Day</option>
+                                              <option value= "First Half">First Half @ AM</option>
+                                              <option value= "Second Half">Second Half @ PM</option>
+                                            </select>
+                                          </div>
+                        
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                          <div class="form-floating col-sm-md-8">
+                                            <label for="reason">Reason: 
+                                            </label>
+                                            <textarea id="reason" name="reason" class=" form-control" rows="2" cols="50"><%= leaveDataInfo[i].reason %></textarea>
+                                          </div>
+                                        </div>
+                                        
+
+            
+                                    <% if (user.department === "Account & Finance" && user.isApprover === false) { %> 
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver Look and jeloh -->
+         
+                                                <option value="<%= approverEmailAddress[0]  %>"><%= approverName[0] %> </option>  
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+                                    
+                                    <% } else if (user.department === "Export Sales & Admin" && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[4]  %>"><%= approverName[4] %> </option>
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if (user.department === "Local Sales & Admin" && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[6]  %>"><%= approverName[6] %> </option>
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if ( (user.department === "Production" || user.department === "Design" || user.department === "Procurement") && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                                <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if (user.department === "Human Resources"  && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[7]  %>"><%= approverName[7] %> </option>
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if (user.department === "Warehouse & Sampling"  && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[5]  %>"><%= approverName[5] %> </option>
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if (user.department === "Occupational Safety and Health"  && user.isApprover === false) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver  -->
+                                                <option value="<%= approverEmailAddress[8]  %>"><%= approverName[8] %> </option>
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+            
+                                      <!-- // for those head of department (exclude John, EC, JE, TENG, lm.lim, lai) -->
+                                    <% } else if ((user.isAdmin === false && user.isApprover === true && user.email != "lai@tekseng.co") ) { %>
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver JELOH and EC -->
+                                                <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                                <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                    <% } else if (user.email === "lai@tekseng.co") { %> 
+                                      <div class="form-row">
+                                        <div class="form-group .col-auto .mr-auto">
+                                          <label for="approver">Approver:
+                                            <sup><b></b></sup>
+                                          </label>
+                                          <select id="approver" name="approver" class="form-control">
+                                            <option value="" selected disabled hidden>Choose here</option>
+                                            <!-- Only these email address can be the approver liming and EC --> 
+                                                <option value="<%= approverEmailAddress[3]  %>"><%= approverName[3] %> </option>
+                                                <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                          </select>
+                                        </div>
+                                      </div>
+            
+                                      <% } else if (user.email === "hr@tekseng.co" || user.email === "lm.lim@tekseng.co" || user.email === "john.chew@tekseng.co") { %> 
+                                        <div class="form-row">
+                                          <div class="form-group .col-auto .mr-auto">
+                                            <label for="approver">Approver:
+                                              <sup><b></b></sup>
+                                            </label>
+                                            <select id="approver" name="approver" class="form-control">
+                                              <option value="" selected disabled hidden>Choose here</option>
+                                              <!-- Only these email address can be the approver  -->
+                                                  <option value="<%= approverEmailAddress[1]  %>"><%= approverName[1] %> </option>
+                                                  <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                            </select>
+                                          </div>
+                                        </div>
+            
+                                      <% } else if (user.email === "je.loh@tekseng.co" ) { %> 
+                                        <div class="form-row">
+                                          <div class="form-group .col-auto .mr-auto">
+                                            <label for="approver">Approver:
+                                              <sup><b></b></sup>
+                                            </label>
+                                            <select id="approver" name="approver" class="form-control">
+                                              <option value="" selected disabled hidden>Choose here</option>
+                                              <!-- Only these email address can be the approver  -->
+                                                  <option value="<%= approverEmailAddress[2]  %>"><%= approverName[2] %> </option>
+                                                  <option value="<%= approverEmailAddress[10]  %>"><%= approverName[10] %> </option>
+                                            </select>
+                                          </div>
+                                        </div>
+            
+                                        <% } else if (user.email === "ec.loh@tekseng.co" || user.email === "jw.loh@tekseng.co") { %> 
+                                          <div class="form-row">
+                                            <div class="form-group .col-auto .mr-auto">
+                                              <label for="approver">Approver:
+                                                <sup><b></b></sup>
+                                              </label>
+                                              <select id="approver" name="approver" class="form-control">
+                                                <option value="" selected disabled hidden>Choose here</option>
+                                                <!-- Only these email address can be the approver  -->
+                                                    <option value="<%= approverEmailAddress[11]  %>"><%= approverName[11] %> </option>
+                                                    <option value="<%= approverEmailAddress[12]  %>"><%= approverName[12] %> </option>
+                                              </select>
+                                            </div>
+                                          </div>
+            
+                                      <% } %>
+
+                                      </div>
+                        
+                                      <div class="modal-footer ">
+                                          <button type="button" class="btn btn-secondary"
+                                              data-dismiss="modal">Close</button>
+                                          <button type="submit" id="submitTitle1" class="btn btn-primary"
+                                              data-dismiss="#accordion">Update</button>
+                                      </div>
+                                    
+                                  </form>
+                                </div>
+                            </div>
+                          </div>
+
+                        </tr>
+
+                        <% } %> 
+                        <% indexID++; %>
+                        <% } %> 
+                    </table>
+                  </div>
+
+                
+              <!-- Approver Leave Application Table -->  
+                  <div class="tab-pane fade show text-nowrap" id="leaveApproval">
+                    <table class="table table-hover table-bordered table-responsive " id="dataTable">
+                      <thead>
+                        <tr style="background-color: rgba(0, 112, 255, 0.08)">
+                          <th scope="col">Action</th>
+                          <th scope="col">Status</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">From</th>
+                          <th scope="col">To</th>
+                          <th scope="col">Days</th>
+                          <th scope="col">Time Types</th>
+                          <th scope="col">Reason</th>
+                          <th scope="col">Applied Date</th>
+                          <th scope="col">Updated Date</th>
+                          <th scope="col">Approved Date</th>
+                          <th scope="col">Approved By</th>
+
+                        </tr>
+                      </thead>
+      
+                      <% let index = 0 %>
+                        <% for (let i = 0; i < leaveDataInfo.length; i++) { %>
+
+                          <% if (user.email === "je.loh@tekseng.co" ) { %> 
+                          <% if ((user._id.toString() != leaveDataInfo[i].userID._id.toString() ) && ( leaveDataInfo[i].approver === "je.loh@tekseng.co" || leaveDataInfo[i].approver === "ec.loh@tekseng.co" )  ) { %>
+                            
+                            <tr class="">
+                        
+                              <td>
+                                <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                >Update</button>
+                                  
+                                <div class="dropdown-menu">
+                                  <% if (user.isApprover === true) { %> 
+                                  <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                    style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; ">
+                                      <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                  <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                    style="padding: 8px 12px 2px 12px; font-weight: 600; color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                      <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                  <% } %>    
+                                </div>    
+                                </td>
+                              <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                              <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                              <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                              <% } else { %>
+                                <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                              <% } %>  
+                                <td><%= leaveDataInfo[i].leavecat %></td>
+                                <td><%= leaveDataInfo[i].fullName %></td>
+                                <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                <td><%= leaveDataInfo[i].day %></td>
+                                <td><%= leaveDataInfo[i].timetype %> </td>
+                                <td><%= leaveDataInfo[i].reason %></td>
+                                <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                <td><%= leaveDataInfo[i].actionBy %></td>
+
+                              <% }  %> 
+                            <% } else if (user.email === "john.chew@tekseng.co") { %>
+                              <% if ( user.department === leaveDataInfo[i].userID.department &&  user._id.toString() === leaveDataInfo[i].userID._id.toString()) { %> 
+                                <tr class="">
+                          
+                                  <td>
+                                    <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                    >Update</button>
+                                      
+                                    <div class="dropdown-menu">
+                                      <% if (user.isApprover === true) { %> 
+                                      <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                      style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; ">
+                                        <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                      <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                      style="padding: 8px 12px 2px 12px; font-weight: 600; color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                        <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                      <% } %>    
+                                    </div>    
+                                    </td>
+                                  <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                    <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                  <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                    <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                  <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                    <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                  <% } else { %>
+                                    <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                  <% } %>  
+                                    <td><%= leaveDataInfo[i].leavecat %></td>
+                                    <td><%= leaveDataInfo[i].fullName %></td>
+                                    <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                    <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                    <td><%= leaveDataInfo[i].day %></td>
+                                    <td><%= leaveDataInfo[i].timetype %> </td>
+                                    <td><%= leaveDataInfo[i].reason %></td>
+                                    <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].actionBy %></td>
+
+                                  <% } %> 
+
+
+                                  <% } else if (user.email === "ec.loh@tekseng.co") { %>
+
+                                    <% if ( (user.empNo != leaveDataInfo[i].empNo) && ( leaveDataInfo[i].approver === "je.loh@tekseng.co" || leaveDataInfo[i].approver === "ec.loh@tekseng.co" ) ) { %> 
+                                      <tr class="">
+                                
+                                        <td>
+                                          <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                          >Update</button>
+                                            
+                                          <div class="dropdown-menu">
+                                            <% if (user.isApprover === true) { %> 
+                                          <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                            style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; ">
+                                              <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                          <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                            style="padding: 8px 12px 2px 12px; font-weight: 600; color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                              <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                            <% } %>    
+                                          </div>    
+                                          </td>
+
+                                        <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                          <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                        <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                          <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                        <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                          <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                        <% } else { %>
+                                          <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                        <% } %>  
+                                        
+                                        <td><%= leaveDataInfo[i].leavecat %></td>
+                                        <td><%= leaveDataInfo[i].fullName %></td>
+                                        <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                        <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                        <td><%= leaveDataInfo[i].day %></td>
+                                        <td><%= leaveDataInfo[i].timetype %> </td>
+                                        <td><%= leaveDataInfo[i].reason %></td>
+                                        <td><%= leaveDataInfo[i].submitDate.substr(0, 24) %></td>
+                                        <td><%= leaveDataInfo[i].updateDate.substr(0, 24) %></td>
+                                        <td><%= leaveDataInfo[i].approvedDate.substr(0, 24) %></td>
+                                        <td><%= leaveDataInfo[i].actionBy %></td>
+                                        
+
+  
+                                        <% } %> 
+
+                                <% } else if (user.email === "jw.loh@tekseng.co") { %>
+                                  <% if ( (user._id.toString() != leaveDataInfo[i].userID._id.toString() ) && ( leaveDataInfo[i].approver === "je.loh@tekseng.co" || leaveDataInfo[i].approver === "jw.loh@tekseng.co" ) ) { %> 
+                                    <tr class="">
+                              
+                                      <td>
+                                        <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                        >Update</button>
+                                          
+                                        <div class="dropdown-menu">
+                                          <% if (user.isApprover === true) { %> 
+                                          <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                            style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; ">
+                                            <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                          <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                            style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                            <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                          <% } %>    
+                                        </div>    
+                                        </td>
+
+                                      <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                        <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                      <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                        <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                      <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                        <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                      <% } else { %>
+                                        <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                      <% } %>  
+                                      <td><%= leaveDataInfo[i].leavecat %></td>
+                                      <td><%= leaveDataInfo[i].fullName %></td>
+                                      <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                      <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                      <td><%= leaveDataInfo[i].day %></td>
+                                      <td><%= leaveDataInfo[i].timetype %> </td>
+                                      <td><%= leaveDataInfo[i].reason %></td>
+                                      <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                      <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                      <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                      <td><%= leaveDataInfo[i].actionBy %></td>
+                                
+                                  <% } %> 
+
+
+                                <% } else if (user.email === "fl.look@tekseng.co") {%>   
+                                <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                  <tr class="">
+                                    <td>
+                                      <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                      >Update</button>
+                                        
+                                      <div class="dropdown-menu">
+                                        <% if (user.isApprover === true) { %> 
+                                        <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                        style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; ">
+                                          <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                        <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                        style="padding: 2px 12px 8px 12px; font-weight: 600; color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                          <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                        <% } %>    
+                                      </div>    
+                                      </td>
+                                    <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                      <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                    <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                      <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                    <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                      <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                    <% } else { %>
+                                      <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                    <% } %>  
+                                    <td><%= leaveDataInfo[i].leavecat %></td>
+                                    <td><%= leaveDataInfo[i].fullName %></td>
+                                    <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                    <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                    <td><%= leaveDataInfo[i].day %></td>
+                                    <td><%= leaveDataInfo[i].timetype %> </td>
+                                    <td><%= leaveDataInfo[i].reason %></td>
+                                    <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                    <td><%= leaveDataInfo[i].actionBy %></td>
+
+                                    <% } %> 
+                                    <% } else if (user.email === "hr@tekseng.co") {%>   
+                                      <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                        <tr class="">
+                                  
+                                          <td>
+                                            <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                            >Update</button>
+                                              
+                                            <div class="dropdown-menu">
+                                              <% if (user.isApprover === true) { %> 
+                                              <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                              <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                              <% } %>    
+                                            </div>    
+                                            </td>
+
+                                          <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                            <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                          <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                            <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                          <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                            <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                          <% } else { %>
+                                            <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                          <% } %>  
+                                          <td><%= leaveDataInfo[i].leavecat %></td>
+                                          <td><%= leaveDataInfo[i].fullName %></td>
+                                          <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                          <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                          <td><%= leaveDataInfo[i].day %></td>
+                                          <td><%= leaveDataInfo[i].timetype %> </td>
+                                          <td><%= leaveDataInfo[i].reason %></td>
+                                          <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                          <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                          <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                          <td><%= leaveDataInfo[i].actionBy %></td>
+                                    
+      
+                                          <% } %> 
+
+                                          <% } else if (user.email === "hcho@tekseng.co") { %>
+                                            <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                              <tr class="">
+                                        
+                                                <td>
+                                                  <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                  >Update</button>
+                                                    
+                                                  <div class="dropdown-menu">
+                                                    <% if (user.isApprover === true) { %> 
+                                                    <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                      style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                      <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                                    <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                      style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                      <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                                    <% } %>    
+                                                  </div>    
+                                                  </td>
+
+                                                <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                                  <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                                <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                                  <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                                  <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                <% } else { %>
+                                                  <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                                <% } %>  
+                                                <td><%= leaveDataInfo[i].leavecat %></td>
+                                                <td><%= leaveDataInfo[i].fullName %></td>
+                                                <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                                <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                                <td><%= leaveDataInfo[i].day %></td>
+                                                <td><%= leaveDataInfo[i].timetype %> </td>
+                                                <td><%= leaveDataInfo[i].reason %></td>
+                                                <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                                <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                                <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                                <td><%= leaveDataInfo[i].actionBy %></td>
+                                          
+          
+                                                <% } %> 
+
+                                                <% } else if (user.email === "jessica.loh@tekseng.co") { %>
+                                                  <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                                    <tr class="">
+                                                                                              
+                                                      <td>
+                                                        <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                        >Update</button>
+                                                          
+                                                        <div class="dropdown-menu">
+                                                          <% if (user.isApprover === true) { %> 
+                                                          <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                            style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                            <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                                          <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                            style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                            <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                                          <% } %>    
+                                                        </div>    
+                                                        </td>
+
+                                                      <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                                        <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                                      <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                                        <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                      <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                                        <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                      <% } else { %>
+                                                        <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                                      <% } %>  
+                                                      <td><%= leaveDataInfo[i].leavecat %></td>
+                                                      <td><%= leaveDataInfo[i].fullName %></td>
+                                                      <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                                      <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                                      <td><%= leaveDataInfo[i].day %></td>
+                                                      <td><%= leaveDataInfo[i].timetype %> </td>
+                                                      <td><%= leaveDataInfo[i].reason %></td>
+                                                      <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                                      <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                                      <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                                      <td><%= leaveDataInfo[i].actionBy %></td>
+                
+                                                      <% } %> 
+
+                                                      <% } else if (user.email === "lai@tekseng.co") { %>
+                                                        <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                                          <tr class="">
+                                                                                                          
+                                                            <td>
+                                                              <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                              >Update</button>
+                                                                
+                                                              <div class="dropdown-menu">
+                                                                <% if (user.isApprover === true) { %> 
+                                                                <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                                  style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                                  <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                                                <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                                  style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                                  <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                                                <% } %>    
+                                                              </div>    
+                                                              </td>
+
+                                                            <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                                              <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                                            <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                                              <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                            <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                                              <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                            <% } else { %>
+                                                              <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                                            <% } %>  
+                                                            <td><%= leaveDataInfo[i].leavecat %></td>
+                                                            <td><%= leaveDataInfo[i].fullName %></td>
+                                                            <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                                            <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                                            <td><%= leaveDataInfo[i].day %></td>
+                                                            <td><%= leaveDataInfo[i].timetype %> </td>
+                                                            <td><%= leaveDataInfo[i].reason %></td>
+                                                            <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                                            <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                                            <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                                            <td><%= leaveDataInfo[i].actionBy %></td>
+                      
+                                                            <% } %>
+                                                            
+                                                            <% } else if (user.email === "lm.lim@tekseng.co") { %>
+                                                              <% if ( (user.department === leaveDataInfo[i].userID.department || leaveDataInfo[i].userID.department === "Occupational Safety and Health" ) && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                                                <tr class="">
+                                                                                                                      
+                                                                  <td>
+                                                                    <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                                    >Update</button>
+                                                                      
+                                                                    <div class="dropdown-menu">
+                                                                      <% if (user.isApprover === true) { %> 
+                                                                      <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                                        style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                                        <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                                                      <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                                        style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                                        <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                                                      <% } %>    
+                                                                    </div>    
+                                                                    </td>
+                                                                  <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                                                    <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                                                  <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                                                    <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                                  <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                                                    <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                                  <% } else { %>
+                                                                    <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                                                  <% } %>  
+                                                                  <td><%= leaveDataInfo[i].leavecat %></td>
+                                                                  <td><%= leaveDataInfo[i].fullName %></td>
+                                                                  <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                                                  <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                                                  <td><%= leaveDataInfo[i].day %></td>
+                                                                  <td><%= leaveDataInfo[i].timetype %> </td>
+                                                                  <td><%= leaveDataInfo[i].reason %></td>
+                                                                  <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                                                  <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                                                  <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                                                  <td><%= leaveDataInfo[i].actionBy %></td>
+                            
+                                                                  <% } %> 
+
+                                                          <% } else if (user.email === "pl.hoo@tekseng.co") {%>   
+                                                            <% if (user.department === leaveDataInfo[i].userID.department && user._id.toString() != leaveDataInfo[i].userID._id.toString()) { %> 
+                                                              <tr class="">
+                                                                <td>
+                                                                  <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                                                                  >Update</button>
+                                                                    
+                                                                  <div class="dropdown-menu">
+                                                                    <% if (user.isApprover === true) { %> 
+                                                                    <a class="dropdown-item" href="#" title="Approved" data-toggle="modal" data-target="#approvedLeaveModal-<%= index %>"
+                                                                      style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; ">
+                                                                      <i class="fas fa-check-circle fa-2x"></i>Approved</a> 
+                                                                    <a class="dropdown-item" href="#" title="Declined" data-toggle="modal" data-target="#declinedLeaveModal-<%= index %>"
+                                                                      style="padding: 2px 12px 8px 12px; font-weight: 600;color:#000000;text-decoration:none; border-top: 1px solid;border-top-color: rgb(230, 230, 230);">
+                                                                      <i class="fas fa-times-circle fa-2x"></i>Declined</a>
+                                                                    <% } %>    
+                                                                  </div>    
+                                                                  </td>
+                                                                <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                                                                  <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                                                                <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                                                                  <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                                <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                                                                  <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                                                                <% } else { %>
+                                                                  <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                                                                <% } %>  
+                                                                <td><%= leaveDataInfo[i].leavecat %></td>
+                                                                <td><%= leaveDataInfo[i].fullName %></td>
+                                                                <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                                                                <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                                                                <td><%= leaveDataInfo[i].day %></td>
+                                                                <td><%= leaveDataInfo[i].timetype %> </td>
+                                                                <td><%= leaveDataInfo[i].reason %></td>
+                                                                <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                                                                <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                                                                <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                                                                <td><%= leaveDataInfo[i].actionBy %></td>
+                                                          
+                            
+                                                                <% } %> 
+                                                            <% } %>   
+                                                    
+
+                                  
+
+                                                            <div class="modal fade" id="approvedLeaveModal-<%= index %>" tabindex="-1"
+                                                              role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                              <div class="modal-dialog modal-dialog-centered" role="document">
+                                                                  <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                          <h5 class="modal-title" id="exampleModalLongTitle">
+                                                                              Leave Approval</h5>
+                                                                          <button type="button" class="close" data-dismiss="modal"
+                                                                              aria-label="Close">
+                                                                              <span aria-hidden="true">&times;</span>
+                                                                          </button>
+                                                                      </div>
+                                                                      <form method="POST"
+                                                                          action="/leaveform/submit/<%= leaveDataInfo[i]._id %>/approve/<%= user._id %>?_method=PUT">
+                                                                          <div class="modal-body">
+                                                                              <label for="inputEmail">Do you want to approve the leave request?</label>
+                                                                              
+                                                                          </div>
+
+                                                                          <div class="modal-footer">
+                                                                              <button type="button" class="btn btn-secondary"
+                                                                                  data-dismiss="modal">Close</button>
+                                                                              <button type="submit" id="delMemoBtn"
+                                                                                  class="btn btn-primary"
+                                                                                  data-dismiss="#accordion">Approve</button>
+                                                                          </div>
+                                                                      </form>
+                                                                  </div>
+                                                              </div>
+                                                            </div>
+
+                                                            <div class="modal fade" id="declinedLeaveModal-<%= index %>" tabindex="-1"
+                                                              role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                              <div class="modal-dialog modal-dialog-centered" role="document">
+                                                                  <div class="modal-content">
+                                                                      <div class="modal-header">
+                                                                          <h5 class="modal-title" id="exampleModalLongTitle">
+                                                                              Leave Decline</h5>
+                                                                          <button type="button" class="close" data-dismiss="modal"
+                                                                              aria-label="Close">
+                                                                              <span aria-hidden="true">&times;</span>
+                                                                          </button>
+                                                                      </div>
+                                                                      <form method="POST"
+                                                                          action="/leaveform/submit/<%= leaveDataInfo[i]._id %>/decline/<%= user._id %>?_method=PUT">
+                                                                          <div class="modal-body">
+                                                                              <label for="inputEmail">Do you want to decline the leave request?</label>
+                                                                          </div>
+
+                                                                          <div class="modal-footer">
+                                                                              <button type="button" class="btn btn-secondary"
+                                                                                  data-dismiss="modal">Close</button>
+                                                                              <button type="submit" id="delMemoBtn"
+                                                                                  class="btn btn-primary"
+                                                                                  data-dismiss="#accordion">Decline</button>
+                                                                          </div>
+                                                                      </form>
+                                                                  </div>
+                                                              </div>
+                                                            </div>
+
+
+                                </tr>
+                              
+                        <% index++; %>  
+                      <% } %> 
+                       
+                    </table>
+                  </div>
+
+
+              <!-- Nav-tab Employee LeaveHistory tab -->         
+                  <div class="tab-pane fade show text-nowrap" id="employeeLeaveHistory">
+                    <table class="table table-hover table-bordered table-responsive " id="dataTable2">
+                      <thead>
+                        <tr style="background-color: rgba(0, 112, 255, 0.08)">
+                          <th scope="col">Status</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">From</th>
+                          <th scope="col">To</th>
+                          <th scope="col">Days</th>
+                          <th scope="col">Time Types</th>
+                          <th scope="col">Reason</th>
+                          <th scope="col">Applied Date</th>
+                          <th scope="col">Update Date</th>
+                          <th scope="col">Approved Date</th>
+                          <th scope="col">Approved By</th>
+                          <th scope="col">Updated By</th>
+                        </tr>
+                      </thead>
+                      
+                      <% let indexID1 = 0 %>
+                        <% for (let i = 0; i < leaveDataInfo.length; i++) { %>
+                          <% if (leaveDataInfo[i].empNo === user.empNo && leaveDataInfo[i].status != "Pending"  ) { %> 
+
+
+                        <tr class="">
+                          <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                            <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                          <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                            <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                            <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else { %>
+                            <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                            <% } %> 
+                          <td><%= leaveDataInfo[i].leavecat %></td>
+                          <td><%= leaveDataInfo[i].fullName %></td>
+                          <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].day %></td>
+                          <td><%= leaveDataInfo[i].timetype %> </td>
+                          <td><%= leaveDataInfo[i].reason %></td>
+                          <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].actionBy %></td>
+                          <td><%= leaveDataInfo[i].updateBy%></td>
+                        </tr>
+
+                        <% } %> 
+                        <% indexID1++; %>
+                        <% } %> 
+                    </table>
+                  </div>
+
+
+              <!-- Nav-tab Managments LeaveHistory tab -->          
+                  <div class="tab-pane fade show text-nowrap" id="mgmtLeavehistory">
+                    <table class="table table-hover table-bordered table-responsive " id="dataTable3">
+                      <thead>
+                        <tr style="background-color: rgba(0, 112, 255, 0.08)">
+                          <th scope="col">Status</th>
+                          <th scope="col">Category</th>
+                          <th scope="col">Name</th>
+                          <th scope="col">From</th>
+                          <th scope="col">To</th>
+                          <th scope="col">Days</th>
+                          <th scope="col">Time Types</th>
+                          <th scope="col">Reason</th>
+                          <th scope="col">Applied Date</th>
+                          <th scope="col">Update Date</th>
+                          <th scope="col">Approved Date</th>
+                          <th scope="col">Approved By</th>
+                          <th scope="col">Update Name (HR)</th>
+
+
+                        </tr>
+                      </thead>
+                      
+                      <% let indexID2 = 0 %>
+
+                        <% for (let i = 0; i < leaveDataInfo.length; i++) { %>
+                          <% if (leaveDataInfo[i].empNo === user.empNo && leaveDataInfo[i].status != "Pending" ) { %> 
+
+
+                        <tr class="">
+                          <% if (leaveDataInfo[i].status === "Approved"){ %> 
+                            <th scope="row" style="color: green"><%= leaveDataInfo[i].status %> </th>
+                          <% } else if (leaveDataInfo[i].status === "Declined") { %>
+                            <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else if (leaveDataInfo[i].status === "Pending") { %>
+                            <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[i].status %> </th>
+                            <% } else { %>
+                            <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[i].status %> </th>   
+                            <% } %> 
+                          <td><%= leaveDataInfo[i].leavecat %></td>
+                          <td><%= leaveDataInfo[i].fullName %></td>
+                          <td><%= leaveDataInfo[i].fromDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].toDate.toDateString() %></td>
+                          <td><%= leaveDataInfo[i].day %></td>
+                          <td><%= leaveDataInfo[i].timetype %> </td>
+                          <td><%= leaveDataInfo[i].reason %></td>
+                          <td><%= leaveDataInfo[i].submitDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].updateDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].approvedDate.substr(0,24) %></td>
+                          <td><%= leaveDataInfo[i].actionBy %></td>
+                          <td><%= leaveDataInfo[i].updateBy %></td>
+                        </tr>
+
+                        <% } %> 
+                        <% indexID2++; %>
+                        <% } %> 
+                    </table>
+                  </div>
+
+              <!-- Home nav-tab hrLeaveAmendment -->         
+              <div class="tab-pane fade show text-nowrap" id="hrLeaveAmendment">
+                <table class="table table-hover table-bordered table-responsive "  id="dataTable4" ><!--text-nowrap -->
+                  <thead>
+                    <tr style="background-color: rgba(0, 112, 255, 0.08)">
+                      <th scope="col">Action</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Category</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">From</th>
+                      <th scope="col">To</th>
+                      <th scope="col">Day</th>
+                      <th scope="col">Time Types</th>
+                      <th scope="col">Reason</th>
+                      <th scope="col">Applied Date</th>
+                      <th scope="col">Update Date</th>
+                      <th scope="col">Approved Date</th>
+                      <th scope="col">Approved By</th>
+                      <th scope="col">Update Name (HR)</th>
+
+                    </tr>
+                  </thead>
+                  
+                  <% let indexID3 = 0 %>
+                    <% for (let z = 0; z < leaveDataInfo.length; z++) { %>
+                      <% if ( leaveDataInfo[z].status === "Approved" ) { %> 
+                        
+
+                    <tr class="">
+                      <% if (leaveDataInfo[z].status === "Approved" ) { %> 
+                        <td>
+                          <button id="update-btn" type="button" class="btn btn-group dropright" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" 
+                          >Update</button>
+  
+                          <div class="dropdown-menu">
+                            <% if (leaveDataInfo[z].status === "Approved"  ) { %>
+                            <a class="dropdown-item" href="#" title="Edit" data-toggle="modal" data-target="#editHRLeaveModal-<%= indexID3 %>">
+                              <i class="far fa-edit fa-2x"></i><b>Edit</b></a>
+  
+                            <a class="dropdown-item" href="#" title="Deleted" data-toggle="modal" data-target="#withdrawHRLeaveModal-<%= indexID3 %>"
+                              <% if (leaveDataInfo[z].status === "Pending" ) { %>style="color:#000000;text-decoration:none; border-top: 1px solid; border-top-color: rgb(230, 230, 230);" <% } %> >
+                              <i class="fas fa-trash fa-2x"></i>   <b>Withdraw</b></a>
+                            <% } %> 
+                          </div>    
+                        </td>
+
+                      <% if (leaveDataInfo[z].status === "Approved"){ %> 
+                        <th scope="row" style="color: green"><%= leaveDataInfo[z].status %> </th>
+                      <% } else if (leaveDataInfo[z].status === "Declined") { %>
+                        <th scope="row" style="color: rgb(255, 0, 0)"><%= leaveDataInfo[z].status %> </th>
+                        <% } else if (leaveDataInfo[z].status === "Pending") { %>
+                        <th scope="row" style="color:rgb(255, 196, 0)"><%= leaveDataInfo[z].status %> </th>
+                        <% } else { %>
+                        <th scope="row" style="color:rgba(255, 115, 0, 0.952)"><%= leaveDataInfo[z].status %> </th>   
+                        <% } %> 
+                      <td><%= leaveDataInfo[z].leavecat %></td>
+                      <td><%= leaveDataInfo[z].fullName %></td>
+                      <td><%= leaveDataInfo[z].fromDate.toLocaleDateString('en-my') %></td>
+                      <td><%= leaveDataInfo[z].toDate.toLocaleDateString('en-my') %></td>
+                      <td><%= leaveDataInfo[z].day %></td>
+                      <td><%= leaveDataInfo[z].timetype %> </td>
+                      <td><%= leaveDataInfo[z].reason %></td>
+                      <td><%= leaveDataInfo[z].submitDate.substr(0,24) %></td>
+                      <td><%= leaveDataInfo[z].updateDate.substr(0,24) %></td>
+                      <td><%= leaveDataInfo[z].approvedDate.substr(0,24) %></td>
+                      <td><%= leaveDataInfo[z].actionBy %></td> 
+                      <td><%= leaveDataInfo[z].updateBy %></td>
+
+                      <% } %> 
+                    </tr>
+      
+
+                      <!-- Update Leave Modal -->
+                      <div class="modal fade" id="editHRLeaveModal-<%= indexID3 %>" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">Leave Amendment (HR)
+                                        </h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form id="leave-form-put"  method="POST" action="/leaveform/submit/<%= leaveDataInfo[z]._id %>/hraamendment/<%= user._id %>?_method=PUT">
+                                  <div class="modal-body">
+                                    <div class="form-row">
+                                      <div class="form-group col-sm-md-4">
+                                        <label for="leaveCategory">Leave Category: 
+                                        </label>
+                                        <select id="leavecat1" name="leavecat1" class="form-control">
+                                          <option selected><%= leaveDataInfo[z].leavecat %> </option>
+                                          <option value="Annual Leave (AL)">Annual Leave (AL)</option>
+                                          <option value="Medical Leave (MC)">Medical Leave (MC)</option>
+                                          <option value="Emergency Leave (EL)">Emergency Leave (EL)</option>
+                                          <option value="Unpaid Leave (UL)">Unpaid Leave (UL)</option>
+                                          <option value="Maternity Leave (ML)">Maternity Leave (ML)</option>
+                                          <option value="Special Leave (SL)">Special Leave (SL)</option>
+                                        </select>
+                                      </div>
+                                      <div class="form-group .col-auto .mr-auto  ">
+                                        <label for="fromDate3">From Date:</label>
+                                        <sup><b>Day-Month-Year</b></sup>
+                                        <input type="text" id="fromDate3" name="fromDate3" class="form-control flatpickr" value="<%= leaveDataInfo[z].fromDate.toString().substr(0,16) %>"  required />
+                                        
+                                      </div>
+                    
+                                      <div class="form-group .col-auto .mr-auto  ">
+                                        <label for="toDate3">To Date:</label>
+                                        <sup><b>Day-Month-Year</b></sup>
+                                        <input type="text" id="toDate3" name="toDate3" class="form-control flatpickr" value="<%= leaveDataInfo[z].toDate.toString().substr(0,16) %>" required />
+                                      </div>
+                                    </div>
+                                   
+
+                                    
+                                    <div class="form-row">
+
+                                      <div class="form-group .col-auto .mr-auto">
+                                        <label for="day">Day:* 
+                                          <sup><b>Bilangan Hari</b></sup>
+                                        </label>
+                                        <select id="day1" name="day1" class="form-control" required>
+                                          <option value="<%= leaveDataInfo[z].day %>" selected><%= leaveDataInfo[z].day %></option>
+                                          <!-- Only these email address can be the approver  -->
+                                          <% let dayN = 0.5; %> 
+                                          <% for (let counter = 0; counter <= 9; counter++ ) { %> 
+                                              <option value="<%= dayN %> "><%= dayN %> </option>
+                                              <% dayN += 0.5 %> 
+                                              <% } %>
+                                            </select>
+                                      </div>
+                                    
+                                      <div class="form-group col-sm-md-4">
+                                          <label for="TimeTypes">Time Types: 
+                                            <sup><b>Jenis Masa</b></sup>
+                                        </label>                      
+                                        <select id="timetype1" name="timetype1" class="form-control" required>
+                                          <option value="<%= leaveDataInfo[z].timetype %>" selected><%= leaveDataInfo[z].timetype %></option>
+                                          <option value= "Full Day">Full Day</option>
+                                          <option value= "First Half">First Half @ AM</option>
+                                          <option value= "Second Half">Second Half @ PM</option>
+                                        </select>
+                                      </div>
+                    
+                                    </div>
+                              
+                                  </div>
+                    
+                                  <div class="modal-footer ">
+                                      <button type="button" class="btn btn-secondary"
+                                          data-dismiss="modal">Close</button>
+                                      <button type="submit" id="submitTitle1" class="btn btn-primary"
+                                          data-dismiss="#accordion">Update</button>
+                                  </div>
+                                
+                              </form>
+                            </div>
+                        </div>
+                      </div>
+
+                      <!-- Delete Leave function Modal -->
+                      <div class="modal fade" id="withdrawHRLeaveModal-<%= indexID3 %>" tabindex="-1"
+                        role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">
+                                        Leave Cancellation</h5>
+                                    <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form method="POST"
+                                    action="/leaveform/submit/<%= leaveDataInfo[z]._id %>/hrwithdraw/<%= user._id %>?_method=DELETE">
+                                    <div class="modal-body">
+                                        <label for="inputEmail">Do you want to withdraw this application ?</label>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Close</button>
+                                        <button type="submit" id="delMemoBtn"
+                                            class="btn btn-primary"
+                                            data-dismiss="#accordion">Withdraw</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                      </div>
+
+
+
+
+                    <% } %> 
+                    <% indexID3++; %>
+                    <% } %> 
+                </table>                  
+
+              </div>
+
+
+                  <!-- End of Main Content -->
+              </div>
+            </div>
+
+          <!-- End of Content Wrapper -->
+        <br>
+        </div>
+
+        <%- include ../partials/footer %>
+      </div>
+    </div>
+
+
+<script type="text/javascript" src="/flatpickr/flatpickr.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+<!-- Page datatable level plugins -->
+<script type="text/javascript" src="/datatable/DataTables-1.12.1/js/jquery.dataTables.min.js" ></script> 
+<script type="text/javascript" src="/datatable/DataTables-1.12.1/js/dataTables.bootstrap4.min.js"></script>
+<script type="text/javascript" src="/datatable/DataTables-2.2.3/dataTables.buttons.min.js" ></script>
+<script type="text/javascript" src="/datatable/DataTables-2.2.3/buttons.bootstrap4.min.js" ></script>
+<script type="text/javascript" src="/datatable/DataTables-2.2.3/jszip.min.js"></script>
+<script type="text/javascript" src="/datatable/DataTables-2.2.3/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="/datatable/DataTables-2.2.3/js/buttons.html5.min.js" ></script>
+<script>
+// Call the dataTables jQuery plugin
+
+
+/* Approver Leave Application Table */
+const table = $(document).ready(function() {
+    $('#dataTable').DataTable({
+      // ordering: false,
+      order: [[1, 'desc'], [9, 'desc']],
+      // page: 'all'
+    });
+  });
+  
+/* */ 
+$(document).ready(function() {
+  $('#dataTable2').DataTable();
+});
+
+$(document).ready(function() {
+  $('#dataTable3').DataTable();
+});
+
+
+
+$(document).ready(function() {
+    let table = $('#dataTable4').DataTable( {
+        // order: [ [4 , 'desc'], [11, 'desc']], 
+        // ordering: false,
+        page: 'all',
+        lengthChange: true,
+        dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>> + <'row'<'col-sm-12'tr>> + <'row'<'col-sm-12 col-md-5'li><'col-sm-12 col-md-7'p>>",
+        buttons: [ 'excel', 'colvis' ],
+     
+    } );      
+
+} );
+
+  /*  All the Calender  */
+$(".flatpickr").flatpickr({
+  "allowInput": false,
+  "dateFormat": "D d-M-Y",
+  "disable": [
+      function(date) {
+          // return true to disable
+          return (date.getDay() === 0 || date.getDay() === 6);
+      }],
+  "locale": {
+      "firstDayOfWeek": 1 // start week on Monday
+  }
+});
+
+</script>
+  
+</body>
+  
+
+<!-- <script>
+
+
+function getVals() {
+  var leaveValues = $("#leavecat1").val();
+  $("p").html("<b> Data: </b> " + leaveValues);
+  // var leaveFromDate = $("#leavecat1").val();
+      // $("p").html(leaveFromDate);
+  }
+
+let getLeaveCatVals = $("select").change(getVals);
+getVals();
+
+
+
+
+
+
+</script> -->
